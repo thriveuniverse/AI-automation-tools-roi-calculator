@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Automation ROI Calculator</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="page-header">
+      <h1>Automation ROI Calculator</h1>
+      <p>Estimate savings from automation by entering your team&#39;s baseline metrics.</p>
+    </header>
+
+    <main class="layout" id="main">
+      <section class="card" aria-labelledby="inputs-title">
+        <div class="card-header">
+          <h2 id="inputs-title">Inputs</h2>
+          <p>Provide monthly baseline data to estimate return on investment.</p>
+        </div>
+        <form id="roi-form" novalidate>
+          <div class="field-grid">
+            <div class="form-field">
+              <label for="wageEurPerHour">Average wage (€/hour)</label>
+              <input id="wageEurPerHour" name="wageEurPerHour" type="number" min="0" step="0.01" inputmode="decimal" required aria-describedby="wageEurPerHour-hint wageEurPerHour-error" />
+              <p class="hint" id="wageEurPerHour-hint">Hourly fully loaded cost for staff performing the task.</p>
+              <p class="error-message" id="wageEurPerHour-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="hoursSavedPerUnit">Hours saved per unit</label>
+              <input id="hoursSavedPerUnit" name="hoursSavedPerUnit" type="number" min="0" step="0.01" inputmode="decimal" required aria-describedby="hoursSavedPerUnit-hint hoursSavedPerUnit-error" />
+              <p class="hint" id="hoursSavedPerUnit-hint">Average time saved for each unit automated.</p>
+              <p class="error-message" id="hoursSavedPerUnit-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="unitsPerMonth">Units per month</label>
+              <input id="unitsPerMonth" name="unitsPerMonth" type="number" min="0" step="1" inputmode="numeric" required aria-describedby="unitsPerMonth-hint unitsPerMonth-error" />
+              <p class="hint" id="unitsPerMonth-hint">Monthly volume of work items the automation touches.</p>
+              <p class="error-message" id="unitsPerMonth-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="baselineErrorsPerMonth">Baseline errors per month</label>
+              <input id="baselineErrorsPerMonth" name="baselineErrorsPerMonth" type="number" min="0" step="1" inputmode="numeric" required aria-describedby="baselineErrorsPerMonth-hint baselineErrorsPerMonth-error" />
+              <p class="hint" id="baselineErrorsPerMonth-hint">Historical number of monthly issues before automation.</p>
+              <p class="error-message" id="baselineErrorsPerMonth-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="errorReductionPct">Error reduction (%)</label>
+              <input id="errorReductionPct" name="errorReductionPct" type="number" min="0" max="100" step="1" inputmode="decimal" required aria-describedby="errorReductionPct-hint errorReductionPct-error" />
+              <p class="hint" id="errorReductionPct-hint">Expected percentage drop in errors after automation.</p>
+              <p class="error-message" id="errorReductionPct-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="costPerErrorEur">Cost per error (€)</label>
+              <input id="costPerErrorEur" name="costPerErrorEur" type="number" min="0" step="0.01" inputmode="decimal" required aria-describedby="costPerErrorEur-hint costPerErrorEur-error" />
+              <p class="hint" id="costPerErrorEur-hint">Average cost to remediate or compensate a single error.</p>
+              <p class="error-message" id="costPerErrorEur-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="oneTimeCostEur">One-time cost (€)</label>
+              <input id="oneTimeCostEur" name="oneTimeCostEur" type="number" min="0" step="1" inputmode="decimal" required aria-describedby="oneTimeCostEur-hint oneTimeCostEur-error" />
+              <p class="hint" id="oneTimeCostEur-hint">Upfront implementation and training expenditure.</p>
+              <p class="error-message" id="oneTimeCostEur-error" aria-live="polite"></p>
+            </div>
+
+            <div class="form-field">
+              <label for="monthlyRecurringCostEur">Monthly recurring cost (€)</label>
+              <input id="monthlyRecurringCostEur" name="monthlyRecurringCostEur" type="number" min="0" step="1" inputmode="decimal" required aria-describedby="monthlyRecurringCostEur-hint monthlyRecurringCostEur-error" />
+              <p class="hint" id="monthlyRecurringCostEur-hint">Subscription, maintenance, or support fees per month.</p>
+              <p class="error-message" id="monthlyRecurringCostEur-error" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="reset-example" class="secondary">Reset to example</button>
+            <button type="button" id="download-csv" class="secondary">Download CSV</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="results-title">
+        <div class="card-header">
+          <h2 id="results-title">Results</h2>
+          <p id="results-status" aria-live="polite">Enter values to see ROI metrics.</p>
+        </div>
+        <div class="results-grid" aria-live="polite" aria-atomic="true">
+          <div class="result" data-result>
+            <h3>Labor savings (monthly)</h3>
+            <output id="laborSavingsMonthly">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Error savings (monthly)</h3>
+            <output id="errorSavingsMonthly">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Gross benefit (monthly)</h3>
+            <output id="grossBenefitMonthly">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Net benefit (monthly)</h3>
+            <output id="netBenefitMonthly">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Annual gross benefit</h3>
+            <output id="annualGrossBenefit">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Annual total cost</h3>
+            <output id="annualTotalCost">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Annual net benefit</h3>
+            <output id="annualNetBenefit">€--</output>
+          </div>
+          <div class="result" data-result>
+            <h3>ROI (Year 1)</h3>
+            <output id="roiPct">--%</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Payback period</h3>
+            <output id="paybackMonths">No payback</output>
+          </div>
+          <div class="result" data-result>
+            <h3>Annualized benefit</h3>
+            <output id="annualizedBenefitEur">€--</output>
+          </div>
+        </div>
+        <p class="assumptions" role="note">
+          <strong>Assumptions:</strong> Calculations are on a monthly basis. ROI is defined as annual net benefit divided by annual total cost.
+        </p>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <p>Use this tool to explore automation scenarios and communicate benefits clearly.</p>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
